@@ -1,0 +1,3 @@
+Kinesics — Accessible Sign Language Learning
+is a web application designed to facilitate the learning of sign language through an intuitive and user-friendly interface. The platform provides a comprehensive set of resources, including visual aids, interactive lessons, and practice exercises, to help users of all skill levels improve their sign language proficiency.
+the application is built with accessibility in mind, ensuring that users with varying abilities can navigate and utilize the platform effectively. It supports multiple languages and offers features such as text-to-speech, high-contrast modes, and keyboard navigation to enhance the learning experience for all users.

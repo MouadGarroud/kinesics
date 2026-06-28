@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kinesics — الحروف العربية</title>
+  <link rel="stylesheet" href="./dist/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Cairo', 'DM Sans', sans-serif; }
+    h1, h2 { font-family: 'Cairo', serif; }
+    .english-text { font-family: 'DM Sans', sans-serif; }
+
+    .letter-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+    .letter-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 16px 32px rgba(0,0,0,0.10);
+    }
+    .hand-bg { background: linear-gradient(135deg, #f0fdfa, #ccfbf1); }
+
+    #navbar-placeholder, #footer-placeholder { direction: ltr; }
+  </style>
+</head>
+<body class="bg-white text-stone-800 flex flex-col min-h-screen">
+
+  <div id="navbar-placeholder"></div>
+
+  <main class="flex-1" dir="rtl">
+    <section class="bg-stone-50 border-b border-stone-100 py-14 px-6 text-center">
+      <span class="text-xs font-semibold uppercase tracking-widest text-teal-600">لغة الإشارة</span>
+      <h1 class="text-4xl md:text-5xl mt-3 text-stone-900">الحروف العربية</h1>
+      <p class="text-stone-500 mt-3 max-w-sm mx-auto text-sm leading-relaxed">اضغط على أي حرف لتتعلم كيفية أدائه بلغة الإشارة.</p>
+    </section>
+
+    <section class="max-w-6xl mx-auto px-6 py-16">
+      <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-4" id="letters-grid-ar">
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <div id="modal-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" dir="rtl">
+    <div id="modal-box" class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 relative">
+      <button id="modal-close" class="absolute top-4 left-4 w-9 h-9 flex items-center justify-center rounded-full bg-stone-100 hover:bg-stone-200 transition-colors text-stone-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div class="text-center mb-6">
+        <div id="modal-letter-big" class="text-7xl font-bold text-teal-600 mb-1" style="font-family:'Cairo',serif;"></div>
+        <p id="modal-letter-label" class="text-stone-500 text-sm font-medium"></p>
+        <p id="modal-letter-transliteration" class="text-stone-400 text-xs mt-0.5 english-text ltr"></p>
+      </div>
+
+      <div class="hand-bg rounded-2xl h-44 flex flex-col items-center justify-center mb-6 border border-teal-100">
+        <div id="modal-hand-svg" class="text-6xl mb-2">🤚</div>
+      </div>
+
+      <div class="flex justify-center mb-4">
+        <button id="modal-lang-toggle" class="text-xs font-semibold px-4 py-1.5 bg-stone-100 text-stone-600 rounded-full hover:bg-teal-50 hover:text-teal-700 transition-colors english-text">
+          Translate to English
+        </button>
+      </div>
+
+      <p id="modal-description" class="text-sm text-stone-600 text-center leading-relaxed"></p>
+    </div>
+  </div>
+
+  <script>
+    const arabicLetters = [
+      { letter: 'أ', name: 'ألف', transliteration: 'Alef', emoji: '☝️', descAR: 'ارفع إصبعك السبابة مستقيماً للأعلى مع ثني بقية الأصابع.', descEN: 'Raise your index finger straight up and bend the rest of your fingers.' },
+      { letter: 'ب', name: 'باء', transliteration: 'Ba', emoji: '🤟', descAR: 'مدّ إصبع السبابة أفقياً مع ثني الإبهام.', descEN: 'Extend your index finger horizontally while bending your thumb.' },
+      { letter: 'ت', name: 'تاء', transliteration: 'Ta', emoji: '✌️', descAR: 'ارفع السبابة والوسطى معاً باتجاه الأمام.', descEN: 'Raise your index and middle fingers together pointing forward.' },
+      { letter: 'ث', name: 'ثاء', transliteration: 'Tha', emoji: '🤚', descAR: 'افتح كفك بالكامل وانشر أصابعك.', descEN: 'Open your palm fully and spread your fingers.' },
+      { letter: 'ج', name: 'جيم', transliteration: 'Jim', emoji: '🤜', descAR: 'اقبض يدك وابرز إصبع الوسطى قليلاً.', descEN: 'Make a fist and slightly protrude your middle finger.' },
+      { letter: 'ح', name: 'حاء', transliteration: 'Ha', emoji: '🖐', descAR: 'مدّ أصابعك الأربعة للأعلى مع ضم الإبهام.', descEN: 'Extend your four fingers upwards and tuck in your thumb.' },
+      { letter: 'خ', name: 'خاء', transliteration: 'Kha', emoji: '✊', descAR: 'اقبض يدك بإحكام مع بروز الإبهام جانباً.', descEN: 'Make a tight fist with your thumb sticking out to the side.' },
+      { letter: 'د', name: 'دال', transliteration: 'Dal', emoji: '👆', descAR: 'افرد سبابتك للأعلى وأمِل يدك قليلاً للأمام.', descEN: 'Extend your index finger upwards and tilt your hand slightly forward.' },
+      { letter: 'ذ', name: 'ذال', transliteration: 'Thal', emoji: '🤙', descAR: 'ابسط إبهامك وخنصرك فقط بشكل جانبي.', descEN: 'Extend only your thumb and pinky outwards to the side.' },
+      { letter: 'ر', name: 'راء', transliteration: 'Ra', emoji: '✌️', descAR: 'اضم السبابة والوسطى وأشر بهما للأسفل.', descEN: 'Bring your index and middle fingers together and point them downwards.' },
+      { letter: 'ز', name: 'زاي', transliteration: 'Zay', emoji: '☝️', descAR: 'أشر بسبابتك وارسم حرف Z في الهواء.', descEN: 'Point your index finger and draw a Z in the air.' },
+      { letter: 'س', name: 'سين', transliteration: 'Sin', emoji: '🖐', descAR: 'افتح يدك بالكامل مع تقارب الأصابع قليلاً.', descEN: 'Open your hand fully with fingers slightly together.' },
+      { letter: 'ش', name: 'شين', transliteration: 'Shin', emoji: '🤌', descAR: 'اجمع أطراف أصابعك مع الإبهام وحرك اليد هزاً خفيفاً.', descEN: 'Bring your fingertips and thumb together and shake your hand lightly.' },
+      { letter: 'ص', name: 'صاد', transliteration: 'Sad', emoji: '🤏', descAR: 'أشر بالإبهام والسبابة نحو الأمام بشكل أفقي.', descEN: 'Point your thumb and index finger horizontally forward.' },
+      { letter: 'ض', name: 'ضاد', transliteration: 'Dad', emoji: '👊', descAR: 'اقبض يدك واضرب الهواء أمامك بلطف.', descEN: 'Make a fist and gently punch the air in front of you.' },
+      { letter: 'ط', name: 'طاء', transliteration: 'Ta\'', emoji: '👌', descAR: 'كوّن دائرة بين الإبهام والسبابة وأشر للأمام.', descEN: 'Form a circle with your thumb and index finger and point forward.' },
+      { letter: 'ظ', name: 'ظاء', transliteration: 'Tha\'', emoji: '🤞', descAR: 'ضم سبابتك ووسطاك معاً مع إمالة اليد.', descEN: 'Bring your index and middle fingers together while tilting your hand.' },
+      { letter: 'ع', name: 'عين', transliteration: '\'Ayn', emoji: '🤟', descAR: 'افرد إبهامك وسبابتك وخنصرك في آنٍ واحد.', descEN: 'Extend your thumb, index, and pinky fingers simultaneously.' },
+      { letter: 'غ', name: 'غين', transliteration: 'Ghayn', emoji: '🤙', descAR: 'احنِ سبابتك للأمام وأشر بالإبهام جانباً.', descEN: 'Bend your index finger forward and point your thumb to the side.' },
+      { letter: 'ف', name: 'فاء', transliteration: 'Fa', emoji: '👈', descAR: 'أشر بسبابتك أفقياً نحو اليسار.', descEN: 'Point your index finger horizontally to the left.' },
+      { letter: 'ق', name: 'قاف', transliteration: 'Qaf', emoji: '✌️', descAR: 'مدّ السبابة والوسطى للأعلى مع نشر قليل.', descEN: 'Extend your index and middle fingers upwards, slightly spread.' },
+      { letter: 'ك', name: 'كاف', transliteration: 'Kaf', emoji: '🤚', descAR: 'ابسط كفك بالكامل واقلب اليد قليلاً للجانب.', descEN: 'Open your palm fully and tilt your hand slightly to the side.' },
+      { letter: 'ل', name: 'لام', transliteration: 'Lam', emoji: '🤙', descAR: 'كوّن حرف L بالإبهام والسبابة.', descEN: 'Form an L shape with your thumb and index finger.' },
+      { letter: 'م', name: 'ميم', transliteration: 'Mim', emoji: '✊', descAR: 'اقبض يدك بإحكام مع وضع الإبهام خلف الأصابع.', descEN: 'Make a tight fist with your thumb placed behind your fingers.' },
+      { letter: 'ن', name: 'نون', transliteration: 'Nun', emoji: '☝️', descAR: 'احنِ سبابتك للأمام واخفض إبهامك.', descEN: 'Bend your index finger forward and lower your thumb.' },
+      { letter: 'ه', name: 'هاء', transliteration: 'Ha', emoji: '🖐', descAR: 'ابسط كفك وأمسك أصابعك معاً باتجاه الأمام.', descEN: 'Open your palm and keep your fingers together pointing forward.' },
+      { letter: 'و', name: 'واو', transliteration: 'Waw', emoji: '🤌', descAR: 'كوّن دائرة صغيرة بأصابعك مع الإبهام.', descEN: 'Form a small circle with your fingers and thumb.' },
+      { letter: 'ي', name: 'ياء', transliteration: 'Ya', emoji: '🤙', descAR: 'ابسط إبهامك وخنصرك جانباً.', descEN: 'Extend your thumb and pinky outwards to the sides.' },
+    ];
+
+    const grid = document.getElementById('letters-grid-ar');
+    arabicLetters.forEach((item) => {
+      const card = document.createElement('div');
+      card.className = 'letter-card bg-stone-50 border border-stone-100 rounded-2xl flex flex-col items-center justify-center py-6 gap-1 select-none';
+      card.innerHTML = `
+        <span class="text-3xl font-bold text-teal-600" style="font-family:'Cairo',serif;">${item.letter}</span>
+        <span class="text-xs text-stone-400 font-medium">${item.name}</span>
+      `;
+      card.addEventListener('click', () => openModal(item));
+      grid.appendChild(card);
+    });
+
+    const overlay = document.getElementById('modal-overlay');
+    const modalClose = document.getElementById('modal-close');
+    const langToggleBtn = document.getElementById('modal-lang-toggle');
+    const descElement = document.getElementById('modal-description');
+
+    let currentItem = null;
+    let currentLang = 'AR'; // Defaults to Arabic for this page
+
+    function openModal(item) {
+      currentItem = item;
+      currentLang = 'AR';
+      
+      document.getElementById('modal-letter-big').textContent = item.letter;
+      document.getElementById('modal-letter-label').textContent = `حرف ${item.name}`;
+      document.getElementById('modal-letter-transliteration').textContent = item.transliteration;
+      document.getElementById('modal-hand-svg').textContent = item.emoji;
+      
+      descElement.textContent = item.descAR;
+      descElement.dir = "rtl";
+      descElement.classList.remove("english-text");
+      langToggleBtn.textContent = "Translate to English";
+      langToggleBtn.dir = "ltr";
+      
+      overlay.classList.remove('hidden');
+    }
+
+    langToggleBtn.addEventListener('click', () => {
+      if (currentLang === 'AR') {
+        currentLang = 'EN';
+        descElement.textContent = currentItem.descEN;
+        descElement.dir = "ltr";
+        descElement.classList.add("english-text");
+        langToggleBtn.textContent = "ترجمة للعربية";
+        langToggleBtn.dir = "rtl";
+      } else {
+        currentLang = 'AR';
+        descElement.textContent = currentItem.descAR;
+        descElement.dir = "rtl";
+        descElement.classList.remove("english-text");
+        langToggleBtn.textContent = "Translate to English";
+        langToggleBtn.dir = "ltr";
+      }
+    });
+
+    function closeModal() { overlay.classList.add('hidden'); }
+    modalClose.addEventListener('click', closeModal);
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    async function injectComponent(id, file) {
+      try {
+        const res = await fetch(file);
+        if (!res.ok) throw new Error();
+        document.getElementById(id).innerHTML = await res.text();
+      } catch(e) { console.warn('Could not load', file); }
+    }
+    injectComponent('navbar-placeholder', 'navbar.html');
+    injectComponent('footer-placeholder', 'footer.html');
+  </script>
+</body>
+</html>
